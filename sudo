@@ -1,0 +1,8 @@
+==> /etc/fstab <==
+
+UUID=4600A20D00A20451	/home/timon/game	ntfs3	defaults	0	0
+
+UUID=E1F1-E2F4	/boot	vfat	defaults	0	2
+
+==> ./files/fstab_add <==
+
