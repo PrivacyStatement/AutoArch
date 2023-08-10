@@ -35,15 +35,11 @@ pacman -Syu
 pacman -S reflector
 reflector -c Germany --sort rate -l 50 --save /etc/pacman.d/mirrorlist 
 
-
-
 #Treiber für AMD und Desktop
-#pacman -S xf89-video-amd plasma plasma-wayland-session
-#Aktivire SDDM
-#systemctl enable sddm.service
+pacman -S xf89-video-amd plasma plasma-wayland-session
 
-#hyperland
-sudo pacman -S grim
+#Aktivire SDDM
+systemctl enable sddm.service
 
 #make game folder
 mkdir /home/timon/game
@@ -68,23 +64,10 @@ firewall-cmd --set-default-zone=home
 #firewall-cmd --add-service libvirt --zone=linbvirt --permanen
 
 #installiere Applikationen
-pacman -S neofetch
+pacman -S neofetch bpytop
 pacman -Sy ttf-liberation
-
 #set multilib enabled in /ect/pacman.conf
-pacman -S flatpak steam lutris gnome-boxes kdeconnect python git
-
-#install timeshift + goverlay vieleicht yay
-mkdir ~/AUR
-cd ~/AUR
-git clone https://aur.archlinux.org/goverlay.git
-git clone https://aur.archlinux.org/timeshift.git
-cd ~/AUR/timeshift
-makepkg -sic
-cd ~/AUR/goverlay
-makepkg -sic
-mkdir ~/AUR
-
+pacman -S flatpak steam lutris
 flatpak install flathub com.jetbrains.PyCharm-Community
 flatpak install flathub org.mozilla.firefox
 flatpak install flathub org.chromium.Chromium
