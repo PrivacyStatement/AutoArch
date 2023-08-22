@@ -42,9 +42,6 @@ reflector -c Germany --sort rate -l 50 --save /etc/pacman.d/mirrorlist
 #Aktivire SDDM
 #systemctl enable sddm.service
 
-#hyperland
-sudo pacman -S grim
-
 #make game folder
 mkdir /home/timon/game
 
@@ -72,18 +69,24 @@ pacman -S neofetch
 pacman -Sy ttf-liberation
 
 #set multilib enabled in /ect/pacman.conf
-pacman -S flatpak steam lutris gnome-boxes kdeconnect python git
+pacman -S flatpak steam lutris gnome-boxes kdeconnect python git alacritty bpytop
 
 #install timeshift + goverlay vieleicht yay
 mkdir ~/AUR
 cd ~/AUR
-git clone https://aur.archlinux.org/goverlay.git
-git clone https://aur.archlinux.org/timeshift.git
-cd ~/AUR/timeshift
+git clone https://aur.archlinux.org/yay-git.git
+cd ~/AUR/yay-git
 makepkg -sic
-cd ~/AUR/goverlay
-makepkg -sic
-mkdir ~/AUR
+
+yay -S goverlay.git
+yay -S timeshift.git
+
+#hyperland
+pacman -S hyprland
+yay -S rofi-wayland
+
+#hyperland screenshots
+pacman -S grim
 
 flatpak install flathub com.jetbrains.PyCharm-Community
 flatpak install flathub org.mozilla.firefox
