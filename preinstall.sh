@@ -1,5 +1,4 @@
 ping 1.1.1.1
-ls /usr/share/kbd/keymaps/**/*.map.gz
 loadkeys de-latin1
 
 lsblk
@@ -36,11 +35,10 @@ mount /dev/first patition /mnt/boot
 mkdir /mnt/home
 mount /dev/fourth patition /mnt/home
 
-pacstrap /mnt base base-devel linux linux-firmare
+pacstrap /mnt base base-devel linux linux-firmware
 arch-chroot /mnt /bin/bash
 ###########################
 #make you settings
 ###########################
-genfstab -U /mnt >> /mnt/etc/fstab
-umount -R /mnt
-reboot
+#genfstab -U /mnt >> /mnt/etc/fstab
+#reboot
