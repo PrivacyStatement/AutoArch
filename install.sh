@@ -1,9 +1,9 @@
 PW=1234
 
 #pacman config
-echo "ParallelDownloads = 5" > /ect/pacman.conf
-echo "[multilib]" > /ect/pacman.conf
-echo "Include = etc/pacman.d/mirrorlist" > /ect/pacman.conf
+echo "ParallelDownloads = 5" >> /ect/pacman.conf
+echo "[multilib]" >> /ect/pacman.conf
+echo "Include = etc/pacman.d/mirrorlist" >> /ect/pacman.conf
 
 #install and update
 pacman -Syu
@@ -12,14 +12,14 @@ pacman -S hyprland
 
 #time, language, hostname, hosts 
 ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
-echo "de_DE.UTF-8 UTF-8" > /etc/local.gen
+echo "de_DE.UTF-8 UTF-8" >> /etc/local.gen
 locale-gen
-echo LANG=de_DE.UTF-8 > /etc/locale.conf
-echo KEYMAP=de-latin1-nodeadkeys > /etc/vconsole.conf
-echo archtimon > /etc/hostname
-echo "127.0.0.1	localhost" > /etc/hosts
-echo "::1		localhost" > /etc/hosts
-echo "127.0.1.1	archtimon.localdomain	arch" > /etc/hosts
+echo LANG=de_DE.UTF-8 >> /etc/locale.conf
+echo KEYMAP=de-latin1-nodeadkeys >> /etc/vconsole.conf
+echo archtimon >> /etc/hostname
+echo "127.0.0.1	localhost" >> /etc/hosts
+echo "::1		localhost" >> /etc/hosts
+echo "127.0.1.1	archtimon.localdomain	arch" >> /etc/hosts
 
 #add user
 echo root:$PW | chpasswd 
