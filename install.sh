@@ -1,13 +1,11 @@
 PW=1234
 
 #pacman config
-echo "ParallelDownloads = 5" >> /ect/pacman.conf
-echo "[multilib]" >> /ect/pacman.conf
-echo "Include = etc/pacman.d/mirrorlist" >> /ect/pacman.conf
+sed -i 's/#\[multilib\]/\[multilib\]\nInclude = \/etc\/pacman.d\/mirrorlist/' /ect/pacman.conf
+sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /ect/pacman.conf
 
 #install and update
 pacman -Syu
-pacman -R iptables
 pacman -Sy xdg-desktop-portal-hyprland jack2 ttf-liberation amdvlk lib32-amdvlk
 pacman -Sy nano steam alacritty grim reflector ntfs-3g unzip wget networkmanager pulseaudio-bluetooth flatpak steam lutris gnome-boxes kdeconnect python git bpytop firewalld ipset ebtables neofetch refind
 pacman -S hyprland
