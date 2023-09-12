@@ -10,6 +10,11 @@ makepkg -sic
 yay -S goverlay
 yay -S timeshift
 yay -S rofi-wayland
+yay -S archlinux-tweak-tool-git
+
+#sddm
+yay -S chili-sddm-theme
+#set theme
 
 flatpak install flathub com.jetbrains.PyCharm-Community
 flatpak install flathub org.mozilla.firefox

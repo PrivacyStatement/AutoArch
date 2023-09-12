@@ -6,9 +6,13 @@ sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /ect/pacman.conf
 
 #install and update
 pacman -Syu
+pacman -Sy sddm
 pacman -Sy xdg-desktop-portal-hyprland jack2 ttf-liberation amdvlk lib32-amdvlk
 pacman -Sy nano steam alacritty grim reflector ntfs-3g unzip wget networkmanager pulseaudio-bluetooth flatpak steam lutris gnome-boxes kdeconnect python git bpytop firewalld ipset ebtables neofetch refind
 pacman -S hyprland
+
+#login manager
+systemctl enable sddm
 
 #time, language, hostname, hosts 
 ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
