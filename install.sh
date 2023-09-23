@@ -1,8 +1,8 @@
 PW=1234
 
 #pacman config
-sed -i 's/#\[multilib\]/\[multilib\]\nInclude = \/etc\/pacman.d\/mirrorlist/' /ect/pacman.conf
-sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /ect/pacman.conf
+sed -i 's/#\[multilib\]/\[multilib\]\nInclude = \/etc\/pacman.d\/mirrorlist/' /etc/pacman.conf
+sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf
 
 #install and update
 pacman -Syu
@@ -32,7 +32,7 @@ echo timon:$PW | chpasswd
 usermod -aG wheel,audio,video,optical,storage timon
 
 #Bootloader config
-refind-install --usedefault /dev/nvme0n1p1 --alldriver
+refind-install --usedefault /dev/nvme0n1p1 --alldrivers
 mkrlconf
 echo 'refind_linux.conf = "Boot with minimal options"   "ro root=/dev/nvme0n1p3"' > /boot/refind_linux.conf
 cp ./refind.conf /boot/EFI/BOOT/refind.conf
@@ -58,4 +58,4 @@ systemctl enable NetworkManager
 systemctl enable bluetooth
 
 #firewall
-systemctl enable --now firewalld
+systemctl enable firewalld
