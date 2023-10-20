@@ -1,7 +1,7 @@
 PW=1234
 
 pacman -Syu
-pacman -Sy refind
+pacman -Sy refind ntfs-3g unzip wget networkmanager
 
 #time, language, hostname, hosts 
 ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
