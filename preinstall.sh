@@ -18,9 +18,9 @@ fdisk /dev/drive
 #p
 #w
 
-mkfs.fat -F 32 -n BOOT /dev/xY
+mkfs.fat -F 32 -n Arch_BOOT /dev/xY
 mkswap -L SWAP /dev/xY
-mkfs.ext4 -L ROOT /dev/xY
+mkfs.ext4 -L Arch_ROOT /dev/xY
 mkfs.ext4 -L HOME /dev/xY
 
 
@@ -34,6 +34,8 @@ mkdir /mnt/boot
 mount /dev/first patition /mnt/boot
 mkdir /mnt/home
 mount /dev/fourth patition /mnt/home
+
+cp -r ./ /mnt/home
 
 pacstrap /mnt base base-devel linux linux-firmware
 arch-chroot /mnt /bin/bash
