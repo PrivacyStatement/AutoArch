@@ -31,7 +31,7 @@ mkdir ./AUR
 cd ./AUR
 git clone https://aur.archlinux.org/yay-git.git
 cd ./yay-git
-makepkg -sic
+sudo -u timon makepkg -sic
 cd ../..
 rm -r ~/AUR
 
@@ -39,19 +39,12 @@ rm -r ~/AUR
 systemctl enable sddm
 cp ./files/sddm.conf /etc/sddm.conf
 
-flatpak install flathub com.jetbrains.PyCharm-Community
-flatpak install flathub org.mozilla.firefox
-flatpak install flathub org.chromium.Chromium
-flatpak install flathub com.visualstudio.code
-flatpak install flathub com.github.tchx84.Flatseal
-flatpak install flathub com.discordapp.Discord
-flatpak install flathub org.libreoffice.LibreOffice
-flatpak install flathub com.getmailspring.Mailspring
-flatpak install flathub com.github.sdv43.whaler
-flatpak install flathub io.github.hakuneko.HakuNeko
-flatpak install flathub com.mojang.Minecraft
+flatpak install flathub com.jetbrains.PyCharm-Community org.mozilla.firefox org.chromium.Chromium com.visualstudio.code \
+                        com.github.tchx84.Flatseal com.discordapp.Discord org.libreoffice.LibreOffice \
+                        com.getmailspring.Mailspring com.github.sdv43.whaler io.github.hakuneko.HakuNeko \
+                        com.mojang.Minecraft \
 
-yay -S swww swaylock-effects goverlay timeshift rofi-wayland archlinux-tweak-tool-git bibata-cursor-theme
+sudo -u timon yay -S swww swaylock-effects goverlay timeshift rofi-wayland archlinux-tweak-tool-git bibata-cursor-theme
 
 ###############################
 ############dotfiles###########

@@ -24,7 +24,7 @@ usermod -aG wheel,audio,video,optical,storage timon
 #Bootloader config
 refind-install --usedefault /dev/nvme0n1p1 --alldrivers
 mkrlconf
-echo 'refind_linux.conf = "Boot with minimal options"   "ro root=/dev/nvme0n1p3"' > /boot/refind_linux.conf
+echo '"Boot with minimal options"   "ro root=/dev/nvme0n1p3"' > /boot/refind_linux.conf
 cp ./refind.conf /boot/EFI/BOOT/refind.conf
 
 mkdir /boot/EFI/BOOT/themes
