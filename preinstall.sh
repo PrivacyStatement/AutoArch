@@ -25,11 +25,11 @@ echo +550M
 echo n 
 echo 2
 echo   
-echo +'$swap'  
+echo +"${swap}"  
 echo n 
 echo 3 
 echo   
-echo +'$root'
+echo +"${root}"
 echo n
 echo 4
 echo   
@@ -49,7 +49,7 @@ echo linux
 echo w # Write changes
 ) | fdisk "/dev/${disk}"
 
-mkfs.fat -F 32 -n ARCH_BOOT "/dev/${disk}${disk_part}"1
+mkfs.fat -F 32 -n ARCH_BOOT "/dev/${disk}${disk_part}1"
 mkswap -L SWAP "/dev/${disk}${disk_part}2"
 mkfs.ext4 -L ARCH_ROOT "/dev/${disk}${disk_part}3"
 mkfs.ext4 -L ARCH_HOME "/dev/${disk}${disk_part}4"
