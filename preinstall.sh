@@ -1,5 +1,8 @@
-lang = "de-latin1"
-disk = "nvmen1"
+lang="de-latin1"
+disk="nvmen1"
+disk_part="p"
+swap="10G"
+root="50G"
 
 if ! ping -c 1 "1.1.1.1" &> /dev/null; then
   echo "No Internet Connection"
@@ -22,11 +25,11 @@ echo +550M
 echo n 
 echo 2
 echo   
-echo +10G  
+echo +'$swap'  
 echo n 
 echo 3 
 echo   
-echo +50G
+echo +'$root'
 echo n
 echo 4
 echo   
@@ -46,17 +49,17 @@ echo linux
 echo w # Write changes
 ) | fdisk /dev/$disk
 
-mkfs.fat -F 32 -n ARCH_BOOT /dev/'$disk'p1
-mkswap -L SWAP /dev/'$disk'p2
-mkfs.ext4 -L ARCH_ROOT /dev/'$disk'p3
-mkfs.ext4 -L ARCH_HOME /dev/'$disk'p4
+mkfs.fat -F 32 -n ARCH_BOOT /dev/'$disk''$disk_part'1
+mkswap -L SWAP /dev/'$disk''$disk_part'2
+mkfs.ext4 -L ARCH_ROOT /dev/'$disk''$disk_part'3
+mkfs.ext4 -L ARCH_HOME /dev/'$disk''$disk_part'4
 
-swapon /dev/'$disk'p2
-mount /dev/'$disk'p3 /mnt
+swapon /dev/'$disk''$disk_part'2
+mount /dev/'$disk''$disk_part'3 /mnt
 mkdir /mnt/boot
-mount /dev/'$disk'p1 /mnt/boot
+mount /dev/'$disk''$disk_part'1 /mnt/boot
 mkdir /mnt/home
-mount /dev/'$disk'p4 /mnt/home
+mount /dev/'$disk''$disk_part'4 /mnt/home
 
 cp -r ./ /mnt/home/AutoArch
 
