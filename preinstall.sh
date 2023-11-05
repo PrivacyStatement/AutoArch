@@ -1,46 +1,67 @@
-ping 1.1.1.1
-loadkeys de-latin1
+lang = "de-latin1"
+disk = "nvmen1"
 
-lsblk
-cfdisk /dev/drive
+if ! ping -c 1 "1.1.1.1" &> /dev/null; then
+  echo "No Internet Connection"
+  exit 1
+fi
 
-#uefi
-ls /sys/firmware/efi/efivars
+loadkeys $lang
 
-fdisk /dev/drive
-#g
+if ! ls /sys/firmware/efi/efivars &> /dev/null; then
+  echo "Not UEFI"
+  exit 1
+fi
 
-#n -> default -> +550M -> t -> ef
-#n -> default -> +10G -> t -> 82
-#n -> default -> +30G -> t -> Linux filesystem
-#n -> default -> default -> t -> Linux filesystem
-#a first patition
-#p
-#w
+(
+echo g
+echo n 
+echo 1 
+echo  
+echo +550M  
+echo n 
+echo 2
+echo   
+echo +10G  
+echo n 
+echo 3 
+echo   
+echo +50G
+echo n
+echo 4
+echo   
+echo
+echo t
+echo 1
+echo uefi
+echo t
+echo 2
+echo swap
+echo t
+echo 3
+echo linux
+echo t
+echo 4
+echo linux
+echo w # Write changes
+) | fdisk /dev/$disk
 
-mkfs.fat -F 32 -n Arch_BOOT /dev/xY
-mkswap -L SWAP /dev/xY
-mkfs.ext4 -L Arch_ROOT /dev/xY
-mkfs.ext4 -L HOME /dev/xY
+mkfs.fat -F 32 -n ARCH_BOOT /dev/'$disk'p1
+mkswap -L SWAP /dev/'$disk'p2
+mkfs.ext4 -L ARCH_ROOT /dev/'$disk'p3
+mkfs.ext4 -L ARCH_HOME /dev/'$disk'p4
 
-
-#gpt -> 
-#Boot 550M bootflag vfat
-#Primary
-
-swapon /dev/second patition 
-mount /dev/third patition /mnt
+swapon /dev/'$disk'p2
+mount /dev/'$disk'p3 /mnt
 mkdir /mnt/boot
-mount /dev/first patition /mnt/boot
+mount /dev/'$disk'p1 /mnt/boot
 mkdir /mnt/home
-mount /dev/fourth patition /mnt/home
+mount /dev/'$disk'p4 /mnt/home
 
-cp -r ./ /mnt/home
+cp -r ./ /mnt/home/AutoArch
 
-pacstrap /mnt base base-devel linux linux-firmware
-arch-chroot /mnt /bin/bash
-###########################
-#make you settings
-###########################
-#genfstab -U /mnt >> /mnt/etc/fstab
-#reboot
+pacstrap /mnt base base-devel linux linux-firmware \
+        refind ntfs-3g unzip wget networkmanager
+
+arch-chroot /mnt /home/AutoArch/install.sh
+
