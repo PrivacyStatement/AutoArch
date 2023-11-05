@@ -47,19 +47,19 @@ echo t
 echo 4
 echo linux
 echo w # Write changes
-) | fdisk /dev/$disk
+) | fdisk "/dev/${disk}"
 
-mkfs.fat -F 32 -n ARCH_BOOT /dev/'$disk''$disk_part'1
-mkswap -L SWAP /dev/'$disk''$disk_part'2
-mkfs.ext4 -L ARCH_ROOT /dev/'$disk''$disk_part'3
-mkfs.ext4 -L ARCH_HOME /dev/'$disk''$disk_part'4
+mkfs.fat -F 32 -n ARCH_BOOT "/dev/${disk}${disk_part}"1
+mkswap -L SWAP "/dev/${disk}${disk_part}2"
+mkfs.ext4 -L ARCH_ROOT "/dev/${disk}${disk_part}3"
+mkfs.ext4 -L ARCH_HOME "/dev/${disk}${disk_part}4"
 
-swapon /dev/'$disk''$disk_part'2
-mount /dev/'$disk''$disk_part'3 /mnt
+swapon "/dev/${disk}${disk_part}2"
+mount "/dev/${disk}${disk_part}3" /mnt
 mkdir /mnt/boot
-mount /dev/'$disk''$disk_part'1 /mnt/boot
+mount "/dev/${disk}${disk_part}1" /mnt/boot
 mkdir /mnt/home
-mount /dev/'$disk''$disk_part'4 /mnt/home
+mount "/dev/${disk}${disk_part}4" /mnt/home
 
 cp -r ./ /mnt/home/AutoArch
 
