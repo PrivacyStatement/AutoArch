@@ -51,8 +51,8 @@ echo w # Write changes
 
 mkfs.fat -F 32 -n ARCH_BOOT "/dev/${disk}${disk_part}1"
 mkswap -L SWAP "/dev/${disk}${disk_part}2"
-mkfs.ext4 -L ARCH_ROOT "/dev/${disk}${disk_part}3"
-mkfs.ext4 -L ARCH_HOME "/dev/${disk}${disk_part}4"
+mkfs.ext4 -F -L ARCH_ROOT "/dev/${disk}${disk_part}3"
+mkfs.ext4 -F -L ARCH_HOME "/dev/${disk}${disk_part}4"
 
 swapon "/dev/${disk}${disk_part}2"
 mount "/dev/${disk}${disk_part}3" /mnt
@@ -67,4 +67,4 @@ pacstrap /mnt base base-devel linux linux-firmware \
         refind ntfs-3g unzip wget networkmanager
 
 arch-chroot /mnt /home/AutoArch/install.sh
-
+genfstab -U /mnt >> /mnt/etc/fstab

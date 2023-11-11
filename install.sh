@@ -1,5 +1,7 @@
 PW=1234
 User=timon
+Patition_BOOT=nvme0n1p1
+Patition_ROOT=nvme0n1p3
 
 #time, language, hostname, hosts 
 ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
@@ -20,9 +22,9 @@ echo $User:$PW | chpasswd
 usermod -aG wheel,audio,video,optical,storage $User
 
 #Bootloader config
-refind-install --usedefault /dev/nvme0n1p1 --alldrivers
+refind-install --usedefault "/dev/${Patition_BOOT}" --alldrivers
 mkrlconf
-echo '"Boot with minimal options"   "ro root=/dev/nvme0n1p3"' > /boot/refind_linux.conf
+echo "\"Boot with minimal options\"   \"ro root=/dev/${Patition_ROOT}\"" > /boot/refind_linux.conf
 cp ./refind.conf /boot/EFI/BOOT/refind.conf
 
 mkdir /boot/EFI/BOOT/themes
@@ -95,24 +97,25 @@ sudo -u $User yay -S swww swaylock-effects goverlay timeshift rofi-wayland archl
 
 
 set_config(){
-    sudo -u $User mkdir $1 
-    sudo -u $User copy $2 "$1/$2"
+    sudo -u $User mkdir -p ~/$1
+    sudo -u $User cp -r ./files/$2 ~/$1/$3
 }
 
-set_config "~" "./files/bashrc" ".bashrc"
-set_config "~/.config" "./files/alacitty.yml" "alacitty.yml"
-set_config "~/.config" "./files/dunstrc" "dunstrc"
-set_config "~" "./files/gtk/gtkrc-2.0" ".gtkrc-2.0"
-set_config "~/.config/gtk-3.0" "./files/gtk/gtk-3.0" "settings.ini"
-set_config "~/.config/gtk-4.0" "./files/gtk/gtk-4.0" "settings.ini"
-set_config "~/.config/gtk" "./files/gtk/gtk.sh" "gtk.sh"
-set_config "~/.config/swaylock" "./files/swaylock" "config"
-set_config "~/.config/swappy" "./files/swappy" "config"
-set_config "~/.config/waybar" "./files/waybar/config" "config"
-set_config "~/.config/waybar" "./files/waybar/style.css" "style.css"
-set_config "~/.config/hypr" "./files/hyprland.conf" "hyprland.conf"
-sudo -u $User cp -r ./background ~/.config/background
-sudo -u $User cp -r ./files/scripts ~/.cofing/scripts
-sudo -u $User cp -r ./files/rofi ~/.cofing/rofi
+set_config "" ".bashrc" "bashrc"
+set_config ".config" "alacitty.yml" "alacitty.yml"
+set_config ".config" "dunstrc" "dunstrc"
+set_config "" ".gtkrc-2.0" "gtk/gtkrc-2.0"
+set_config ".config/gtk-3.0" "settings.ini" "gtk/gtk-3.0"
+set_config ".config/gtk-4.0" "settings.ini" "gtk/gtk-4.0"
+set_config ".config/gtk" "gtk.sh" "gtk/gtk.sh"
+set_config ".config/swaylock" "config" "swaylock"
+set_config ".config/swappy" "config" "swappy"
+set_config ".config/waybar" "config" "waybar/config"
+set_config ".config/waybar" "style.css" "waybar/style.css"
+set_config ".config/hypr" "hyprland.conf" "hyprland.conf"
+set_config ".config" "background" "background" "../background"
+set_config ".config" "scripts" "scripts"
+set_config ".config" "rofi" "rofi"
+
 
 
