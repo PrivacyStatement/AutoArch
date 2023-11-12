@@ -3,8 +3,8 @@ User=timon
 Patition_BOOT=nvme0n1p1
 Patition_ROOT=nvme0n1p3
 #install default
-vulkan_driver=vulkan-radeon # amdvlk nvidia-utils vulkan-intel vulkan-swrast vulkan-virtio
 steam_font=ttf-liberation
+hyprland_portal=xdg-desktop-portal-hyprland
 
 #time, language, hostname, hosts 
 ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
@@ -28,10 +28,9 @@ usermod -aG wheel,audio,video,optical,storage $User
 refind-install --usedefault "/dev/${Patition_BOOT}" --alldrivers
 mkrlconf
 echo "\"Boot with minimal options\"   \"ro root=/dev/${Patition_ROOT}\"" > /boot/refind_linux.conf
-cp ./refind.conf /boot/EFI/BOOT/refind.conf
+cp /home/AutoArch/refind.conf /boot/EFI/BOOT/refind.conf
 
 mkdir /boot/EFI/BOOT/themes
-cp ./files/refind.conf /boot/EFI/BOOT/refind.conf
 wget https://github.com/evanpurkhiser/rEFInd-minimal/archive/refs/heads/main.zip
 unzip main.zip -d /boot/EFI/BOOT/themes
 mv /boot/EFI/BOOT/themes/rEFInd-minimal-main /boot/EFI/BOOT/themes/rEFInd-minimal
@@ -53,11 +52,11 @@ pacman -Syu
 #fonts + themes
 pacman -Sy ttf-liberation ttf-font-awesome ttf-fira-sans ttf-fira-code ttf-firacode-nerd breeze breeze-gtk chili-sddm-theme papirus-icon-theme
 #driver
-pacman -Sy amdvlk lib32-amdvlk gnome-keyring pipewire pipewire-jack pipewire-media-session pulseaudio-bluetooth
+pacman -Sy gnome-keyring pipewire pipewire-jack pipewire-media-session pulseaudio-bluetooth
 #hyprland
-pacman -Sy xdg-desktop-portal-hyprland hyprland sddm dunst waybar polkit-kde-agent qt5-wayland qt6-wayland cliphist wlogout
+pacman -Sy xdg-desktop-portal-hyprland hyprland dunst waybar polkit-kde-agent qt5-wayland qt6-wayland cliphist wlogout
 #comand line applications
-pacman -Sy reflector grim slurp nano flatpak python git bpytop firewalld ipset ebtables neofetch xautolock swayidle
+pacman -Sy $hyprland_portal reflector grim slurp nano flatpak python git bpytop firewalld ipset ebtables neofetch xautolock swayidle
 #gui
 pacman -Sy $steam_font steam alacritty lutris gnome-boxes kdeconnect sxiv mpv vlc xfce4-power-manager thunar lxappearance pavucontrol blueman swappy
 
@@ -65,11 +64,10 @@ pacman -Sy $steam_font steam alacritty lutris gnome-boxes kdeconnect sxiv mpv vl
 systemctl enable bluetooth
 
 #firewall
-systemctl enable firewalld
+systemctl enable firewalld --now
 firewall-cmd --set-default-zone=home
 
 #set fastes mirror
-pacman -S reflector
 reflector -c Germany --sort rate -l 50 --save /etc/pacman.d/mirrorlist 
 
 #install yay
@@ -84,14 +82,14 @@ rm -r ~/AUR
 
 #sddm
 systemctl enable sddm
-cp ./files/sddm.conf /etc/sddm.conf
+cp /home/AutoArch/files/sddm.conf /etc/sddm.conf
 
 flatpak install -y flathub com.jetbrains.PyCharm-Community org.mozilla.firefox org.chromium.Chromium com.visualstudio.code \
                         com.github.tchx84.Flatseal com.discordapp.Discord org.libreoffice.LibreOffice \
                         com.getmailspring.Mailspring com.github.sdv43.whaler io.github.hakuneko.HakuNeko \
                         com.mojang.Minecraft \
 
-sudo -u $User yay -S swww swaylock-effects goverlay timeshift rofi-wayland archlinux-tweak-tool-git bibata-cursor-theme
+sudo -u $User yay -S swww swaylock-effects goverlay timeshift rofi-lbonn-wayland archlinux-tweak-tool-git bibata-cursor-theme
 
 ###############################
 ############dotfiles###########
@@ -101,7 +99,7 @@ sudo -u $User yay -S swww swaylock-effects goverlay timeshift rofi-wayland archl
 
 set_config(){
     mkdir -p /home/$User/$1
-    cp -r ./files/$2 /home/$User/$1/$3
+    cp -r home/AutoArch/files/$2 /home/$User/$1/$3
 }
 
 set_config "" ".bashrc" "bashrc"

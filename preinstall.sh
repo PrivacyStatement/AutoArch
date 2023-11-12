@@ -1,5 +1,5 @@
 lang="de-latin1"
-disk="nvmen1"
+disk="nvme0n1"
 disk_part="p"
 swap="10G"
 root="50G"
@@ -65,7 +65,7 @@ chmod 777 ./install.sh
 cp -r ./ /mnt/home/AutoArch
 
 pacstrap /mnt base base-devel linux linux-firmware \
-        refind ntfs-3g unzip wget networkmanager
+        refind ntfs-3g unzip wget networkmanager sddm
 
-arch-chroot /mnt "/home/AutoArch/install.sh | tee /mnt/install.log"
+arch-chroot /mnt /home/AutoArch/install.sh
 genfstab -U /mnt >> /mnt/etc/fstab
