@@ -2,6 +2,9 @@ PW=1234
 User=timon
 Patition_BOOT=nvme0n1p1
 Patition_ROOT=nvme0n1p3
+#install default
+vulkan_driver=vulkan-radeon # amdvlk nvidia-utils vulkan-intel vulkan-swrast vulkan-virtio
+steam_font=ttf-liberation
 
 #time, language, hostname, hosts 
 ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
@@ -50,13 +53,13 @@ pacman -Syu
 #fonts + themes
 pacman -Sy ttf-liberation ttf-font-awesome ttf-fira-sans ttf-fira-code ttf-firacode-nerd breeze breeze-gtk chili-sddm-theme papirus-icon-theme
 #driver
-pacman -Sy amdvlk lib32-amdvlk gnome-keyring pipewire pulseaudio-bluetooth
+pacman -Sy amdvlk lib32-amdvlk gnome-keyring pipewire pipewire-jack pipewire-media-session pulseaudio-bluetooth
 #hyprland
 pacman -Sy xdg-desktop-portal-hyprland hyprland sddm dunst waybar polkit-kde-agent qt5-wayland qt6-wayland cliphist wlogout
 #comand line applications
 pacman -Sy reflector grim slurp nano flatpak python git bpytop firewalld ipset ebtables neofetch xautolock swayidle
 #gui
-pacman -Sy steam alacritty lutris gnome-boxes kdeconnect sxiv mpv vlc xfce4-power-manager thunar lxappearance pavucontrol blueman swappy
+pacman -Sy $steam_font steam alacritty lutris gnome-boxes kdeconnect sxiv mpv vlc xfce4-power-manager thunar lxappearance pavucontrol blueman swappy
 
 #Bluetooth
 systemctl enable bluetooth
@@ -83,7 +86,7 @@ rm -r ~/AUR
 systemctl enable sddm
 cp ./files/sddm.conf /etc/sddm.conf
 
-flatpak install flathub com.jetbrains.PyCharm-Community org.mozilla.firefox org.chromium.Chromium com.visualstudio.code \
+flatpak install -y flathub com.jetbrains.PyCharm-Community org.mozilla.firefox org.chromium.Chromium com.visualstudio.code \
                         com.github.tchx84.Flatseal com.discordapp.Discord org.libreoffice.LibreOffice \
                         com.getmailspring.Mailspring com.github.sdv43.whaler io.github.hakuneko.HakuNeko \
                         com.mojang.Minecraft \
@@ -97,8 +100,8 @@ sudo -u $User yay -S swww swaylock-effects goverlay timeshift rofi-wayland archl
 
 
 set_config(){
-    sudo -u $User mkdir -p ~/$1
-    sudo -u $User cp -r ./files/$2 ~/$1/$3
+    mkdir -p /home/$User/$1
+    cp -r ./files/$2 /home/$User/$1/$3
 }
 
 set_config "" ".bashrc" "bashrc"

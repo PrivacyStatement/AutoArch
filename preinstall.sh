@@ -61,10 +61,11 @@ mount "/dev/${disk}${disk_part}1" /mnt/boot
 mkdir /mnt/home
 mount "/dev/${disk}${disk_part}4" /mnt/home
 
+chmod 777 ./install.sh
 cp -r ./ /mnt/home/AutoArch
 
 pacstrap /mnt base base-devel linux linux-firmware \
         refind ntfs-3g unzip wget networkmanager
 
-arch-chroot /mnt /home/AutoArch/install.sh
+arch-chroot /mnt "/home/AutoArch/install.sh | tee /mnt/install.log"
 genfstab -U /mnt >> /mnt/etc/fstab
