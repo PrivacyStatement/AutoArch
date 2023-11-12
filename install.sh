@@ -2,9 +2,15 @@ PW=1234
 User=timon
 Patition_BOOT=nvme0n1p1
 Patition_ROOT=nvme0n1p3
+debug=true
 #install default
 steam_font=ttf-liberation
 hyprland_portal=xdg-desktop-portal-hyprland
+if [ !debug ]; then
+confirm=--noconfirm
+else
+confirm=""
+fi
 
 #time, language, hostname, hosts 
 ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
@@ -48,24 +54,23 @@ sed -i 's/#\[multilib\]/\[multilib\]\nInclude = \/etc\/pacman.d\/mirrorlist/' /e
 sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf
 
 #install and update
-pacman -Syu
+pacman -Syu $confirm
 #fonts + themes
-pacman -Sy ttf-liberation ttf-font-awesome ttf-fira-sans ttf-fira-code ttf-firacode-nerd breeze breeze-gtk chili-sddm-theme papirus-icon-theme
+pacman -Sy $confirm ttf-liberation ttf-font-awesome ttf-fira-sans ttf-fira-code ttf-firacode-nerd breeze breeze-gtk chili-sddm-theme papirus-icon-theme
 #driver
-pacman -Sy gnome-keyring pipewire pipewire-jack pipewire-media-session pulseaudio-bluetooth
+pacman -Sy $confirm gnome-keyring pipewire pipewire-jack pipewire-media-session pulseaudio-bluetooth
 #hyprland
-pacman -Sy xdg-desktop-portal-hyprland hyprland dunst waybar polkit-kde-agent qt5-wayland qt6-wayland cliphist wlogout
+pacman -Sy $confirm xdg-desktop-portal-hyprland hyprland dunst waybar polkit-kde-agent qt5-wayland qt6-wayland cliphist wlogout
 #comand line applications
-pacman -Sy $hyprland_portal reflector grim slurp nano flatpak python git bpytop firewalld ipset ebtables neofetch xautolock swayidle
+pacman -Sy $confirm $hyprland_portal reflector grim slurp nano flatpak python git bpytop firewalld ipset ebtables neofetch xautolock swayidle
 #gui
-pacman -Sy $steam_font steam alacritty lutris gnome-boxes kdeconnect sxiv mpv vlc xfce4-power-manager thunar lxappearance pavucontrol blueman swappy
+pacman -Sy $confirm $steam_font steam alacritty lutris gnome-boxes kdeconnect sxiv mpv vlc xfce4-power-manager thunar lxappearance pavucontrol blueman swappy
 
 #Bluetooth
 systemctl enable bluetooth
 
 #firewall
-systemctl enable firewalld --now
-firewall-cmd --set-default-zone=home
+systemctl enable firewalld
 
 #set fastes mirror
 reflector -c Germany --sort rate -l 50 --save /etc/pacman.d/mirrorlist 
@@ -84,11 +89,6 @@ rm -r ~/AUR
 systemctl enable sddm
 cp /home/AutoArch/files/sddm.conf /etc/sddm.conf
 
-flatpak install -y flathub com.jetbrains.PyCharm-Community org.mozilla.firefox org.chromium.Chromium com.visualstudio.code \
-                        com.github.tchx84.Flatseal com.discordapp.Discord org.libreoffice.LibreOffice \
-                        com.getmailspring.Mailspring com.github.sdv43.whaler io.github.hakuneko.HakuNeko \
-                        com.mojang.Minecraft \
-
 sudo -u $User yay -S swww swaylock-effects goverlay timeshift rofi-lbonn-wayland archlinux-tweak-tool-git bibata-cursor-theme
 
 ###############################
@@ -99,22 +99,22 @@ sudo -u $User yay -S swww swaylock-effects goverlay timeshift rofi-lbonn-wayland
 
 set_config(){
     mkdir -p /home/$User/$1
-    cp -r home/AutoArch/files/$2 /home/$User/$1/$3
+    cp -r home/AutoArch/files/$3 /home/$User/$1/$2
 }
 
 set_config "" ".bashrc" "bashrc"
 set_config ".config" "alacitty.yml" "alacitty.yml"
 set_config ".config" "dunstrc" "dunstrc"
 set_config "" ".gtkrc-2.0" "gtk/gtkrc-2.0"
-set_config ".config/gtk-3.0" "settings.ini" "gtk/gtk-3.0"
-set_config ".config/gtk-4.0" "settings.ini" "gtk/gtk-4.0"
+set_config ".config/gtk-3.0" "settings.ini" "gtk/gtk.3.0"
+set_config ".config/gtk-4.0" "settings.ini" "gtk/gtk.4.0"
 set_config ".config/gtk" "gtk.sh" "gtk/gtk.sh"
 set_config ".config/swaylock" "config" "swaylock"
 set_config ".config/swappy" "config" "swappy"
 set_config ".config/waybar" "config" "waybar/config"
 set_config ".config/waybar" "style.css" "waybar/style.css"
 set_config ".config/hypr" "hyprland.conf" "hyprland.conf"
-set_config ".config" "background" "background" "../background"
+set_config ".config" "background" "../background"
 set_config ".config" "scripts" "scripts"
 set_config ".config" "rofi" "rofi"
 
