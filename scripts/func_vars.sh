@@ -20,7 +20,7 @@ wait_input(){
       exit 1
     fi
   fi
-  [[ "$debug" == true ]] && (echo "Press Enter to continue..."; read)
+  [[ "$debug" == true && $4 ]] && (echo "Press Enter to continue..."; read)
 }
 
 set_config(){
