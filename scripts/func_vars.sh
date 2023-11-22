@@ -12,11 +12,13 @@ White='\033[0;37m'        # White
 width=$(stty size | awk '{print $2}')
 
 wait_input(){
-  if [ $status -eq 0 ]; then
+  if [ $? -eq 0 ]; then
     echo -e "${Green}${1}${Color_Off}"
   else
     echo -e "${Red}${2}${Color_Off}"
-    exit 1
+    if [ ! $3 ]; then
+      exit 1
+    fi
   fi
   [[ "$debug" == true ]] && (echo "Press Enter to continue..."; read)
 }

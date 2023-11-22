@@ -1,26 +1,21 @@
 source ./scripts/func_vars.sh
 source ./settings.sh
 
-if ! ping -c 1 "1.1.1.1" &> /dev/null; then
-  echo -e "${Red}No Internet Connection${Color_Off}"
-  exit 1
-fi
-wait_input "Internet Connection Confirmt"
+ping -c 1 "1.1.1.1"
+wait_input "Internet Connection Confirmt" "No Internet Connection"
 
 pacman -Sy --noconfirm figlet
 wait_input "Figlet Installed"
 
 
 figlet "Testing UEFI"
-if ! ls /sys/firmware/efi/efivars &> /dev/null; then
-  echo "${Red}Not UEFI${Color_Off}"
-  exit 1
-fi
-wait_input "UEFI Used"
+ls /sys/firmware/efi/efivars
+wait_input "UEFI Used" "Not UEFI" true
 
 loadkeys $lang
-wait_input "Keyboard layout $lang loaded"
+wait_input "Keyboard layout $lang loaded" "Keyboard layout $lang couldn't get loaded"
 
+figlet "Formating Drive ${disk}"
 (
 echo g
 echo n 
@@ -53,6 +48,7 @@ echo 4
 echo linux
 echo w # Write changes
 ) | fdisk "/dev/${disk}"
+wait_input "Drive Formated" "Drive Formatting faild"
 
 mkfs.fat -F 32 -n ARCH_BOOT "/dev/${disk}${disk_part}1"
 mkswap -L SWAP "/dev/${disk}${disk_part}2"
