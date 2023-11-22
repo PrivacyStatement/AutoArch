@@ -1,0 +1,10 @@
+lang="de-latin1"
+disk="nvme0n1"
+disk_part="p"
+swap="10G"
+root="50G"
+debug=true
+User=timon
+PW=1234
+Patition_BOOT=nvme0n1p1
+Patition_ROOT=nvme0n1p3

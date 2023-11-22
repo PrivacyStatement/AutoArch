@@ -1,20 +1,25 @@
-lang="de-latin1"
-disk="nvme0n1"
-disk_part="p"
-swap="10G"
-root="50G"
+source ./scripts/func_vars.sh
+source ./settings.sh
 
 if ! ping -c 1 "1.1.1.1" &> /dev/null; then
-  echo "No Internet Connection"
+  echo -e "${Red}No Internet Connection${Color_Off}"
   exit 1
 fi
+wait_input "Internet Connection Confirmt"
+
+pacman -Sy --noconfirm figlet
+wait_input "Figlet Installed"
+
+
+figlet "Testing UEFI"
+if ! ls /sys/firmware/efi/efivars &> /dev/null; then
+  echo "${Red}Not UEFI${Color_Off}"
+  exit 1
+fi
+wait_input "UEFI Used"
 
 loadkeys $lang
-
-if ! ls /sys/firmware/efi/efivars &> /dev/null; then
-  echo "Not UEFI"
-  exit 1
-fi
+wait_input "Keyboard layout $lang loaded"
 
 (
 echo g

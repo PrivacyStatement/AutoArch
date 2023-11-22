@@ -1,8 +1,6 @@
-PW=1234
-User=timon
-Patition_BOOT=nvme0n1p1
-Patition_ROOT=nvme0n1p3
-debug=true
+source ./scripts/func_vars.sh
+source ./settings.sh
+
 #install default
 steam_font=ttf-liberation
 hyprland_portal=xdg-desktop-portal-hyprland
@@ -94,13 +92,6 @@ sudo -u $User yay -S swww swaylock-effects goverlay timeshift rofi-lbonn-wayland
 ###############################
 ############dotfiles###########
 ###############################
-
-
-
-set_config(){
-    mkdir -p /home/$User/$1
-    cp -r home/AutoArch/files/$3 /home/$User/$1/$2
-}
 
 set_config "" ".bashrc" "bashrc"
 set_config ".config" "alacitty.yml" "alacitty.yml"
