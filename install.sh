@@ -1,113 +1,94 @@
 source ./scripts/func_vars.sh
 source ./settings.sh
 
-#install default
-steam_font=ttf-liberation
-hyprland_portal=xdg-desktop-portal-hyprland
-if [ !debug ]; then
-confirm=--noconfirm
-else
-confirm=""
-fi
+ping -c 1 "1.1.1.1"
+wait_input "Internet Connection Confirmed" "No Internet Connection"
 
-#time, language, hostname, hosts 
-ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
-echo "de_DE.UTF-8 UTF-8" >> /etc/local.gen
-locale-gen
-echo LANG=de_DE.UTF-8 >> /etc/locale.conf
-echo KEYMAP=de-latin1-nodeadkeys >> /etc/vconsole.conf
-echo arch"$User" >> /etc/hostname
-echo "127.0.0.1	localhost" >> /etc/hosts
-echo "::1		localhost" >> /etc/hosts
-echo "127.0.1.1	arch"$User".localdomain	arch" >> /etc/hosts
-
-#add user
-echo "%wheel      ALL=(ALL:ALL) ALL" >> /etc/sudoers
-echo root:$PW | chpasswd 
-useradd -m $User
-echo $User:$PW | chpasswd
-usermod -aG wheel,audio,video,optical,storage $User
-
-#Bootloader config
-refind-install --usedefault "/dev/${Patition_BOOT}" --alldrivers
-mkrlconf
-echo "\"Boot with minimal options\"   \"ro root=/dev/${Patition_ROOT}\"" > /boot/refind_linux.conf
-cp /home/AutoArch/refind.conf /boot/EFI/BOOT/refind.conf
-
-mkdir /boot/EFI/BOOT/themes
-wget https://github.com/evanpurkhiser/rEFInd-minimal/archive/refs/heads/main.zip
-unzip main.zip -d /boot/EFI/BOOT/themes
-mv /boot/EFI/BOOT/themes/rEFInd-minimal-main /boot/EFI/BOOT/themes/rEFInd-minimal
-rm main.zip
-
-#make game folder
-mkdir /home/$User/game
-mount /dev/sdb2 /home/$User/game
-
-#Start Network after reboot
-systemctl enable NetworkManager
-
-#pacman config
-sed -i 's/#\[multilib\]/\[multilib\]\nInclude = \/etc\/pacman.d\/mirrorlist/' /etc/pacman.conf
-sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf
-
-#install and update
-pacman -Syu $confirm
-#fonts + themes
-pacman -Sy $confirm ttf-liberation ttf-font-awesome ttf-fira-sans ttf-fira-code ttf-firacode-nerd breeze breeze-gtk chili-sddm-theme papirus-icon-theme
-#driver
-pacman -Sy $confirm gnome-keyring pipewire pipewire-jack pipewire-media-session pulseaudio-bluetooth
-#hyprland
-pacman -Sy $confirm xdg-desktop-portal-hyprland hyprland dunst waybar polkit-kde-agent qt5-wayland qt6-wayland cliphist wlogout
-#comand line applications
-pacman -Sy $confirm $hyprland_portal reflector grim slurp nano flatpak python git bpytop firewalld ipset ebtables neofetch xautolock swayidle
-#gui
-pacman -Sy $confirm $steam_font steam alacritty lutris gnome-boxes kdeconnect sxiv mpv vlc xfce4-power-manager thunar lxappearance pavucontrol blueman swappy
-
-#Bluetooth
-systemctl enable bluetooth
-
-#firewall
-systemctl enable firewalld
-
-#set fastes mirror
-reflector -c Germany --sort rate -l 50 --save /etc/pacman.d/mirrorlist 
-
-#install yay
-mkdir ./AUR
-cd ./AUR
-git clone https://aur.archlinux.org/yay-git.git
-chmod 777 ./yay-git
-cd ./yay-git
-sudo -u $User makepkg -sic
-cd ../..
-rm -r ~/AUR
-
-#sddm
-systemctl enable sddm
-cp /home/AutoArch/files/sddm.conf /etc/sddm.conf
-
-sudo -u $User yay -S swww swaylock-effects goverlay timeshift rofi-lbonn-wayland archlinux-tweak-tool-git bibata-cursor-theme
-
-###############################
-############dotfiles###########
-###############################
-
-set_config "" ".bashrc" "bashrc"
-set_config ".config" "alacitty.yml" "alacitty.yml"
-set_config ".config" "dunstrc" "dunstrc"
-set_config "" ".gtkrc-2.0" "gtk/gtkrc-2.0"
-set_config ".config/gtk-3.0" "settings.ini" "gtk/gtk.3.0"
-set_config ".config/gtk-4.0" "settings.ini" "gtk/gtk.4.0"
-set_config ".config/gtk" "gtk.sh" "gtk/gtk.sh"
-set_config ".config/swaylock" "config" "swaylock"
-set_config ".config/swappy" "config" "swappy"
-set_config ".config/waybar" "config" "waybar/config"
-set_config ".config/waybar" "style.css" "waybar/style.css"
-set_config ".config/hypr" "hyprland.conf" "hyprland.conf"
-set_config ".config" "background" "../background"
-set_config ".config" "scripts" "scripts"
-set_config ".config" "rofi" "rofi"
+pacman -Sy --noconfirm figlet
+wait_input "Figlet Installed"
 
 
+figlet "Testing UEFI"
+ls /sys/firmware/efi/efivars
+wait_input "UEFI Used" "Not UEFI" true
 
+loadkeys $lang
+wait_input "Keyboard layout $lang loaded" "Keyboard layout $lang couldn't get loaded"
+
+figlet "Patition Drive ${disk}"
+(
+echo g
+echo n 
+echo 1 
+echo  
+echo +550M  
+echo n 
+echo 2
+echo   
+echo +"${swap}"  
+echo n 
+echo 3 
+echo   
+echo +"${root}"
+echo n
+echo 4
+echo   
+echo
+echo t
+echo 1
+echo uefi
+echo t
+echo 2
+echo swap
+echo t
+echo 3
+echo linux
+echo t
+echo 4
+echo linux
+echo w # Write changes
+) | fdisk "/dev/${disk}"
+wait_input "Partitions created" "Drive Formatting failed"
+
+mkfs.fat -F 32 -n ARCH_BOOT "/dev/${disk}${disk_part}1"
+wait_input "Drive Formated /dev/${disk}${disk_part}1" "Drive Formatting failed /dev/${disk}${disk_part}1" false true
+####################################################################################################################
+mkswap -L SWAP "/dev/${disk}${disk_part}2"
+wait_input "Drive Formated /dev/${disk}${disk_part}2" "Drive Formatting failed /dev/${disk}${disk_part}2" false true
+####################################################################################################################
+mkfs.ext4 -F -L ARCH_ROOT "/dev/${disk}${disk_part}3"
+wait_input "Drive Formated /dev/${disk}${disk_part}3" "Drive Formatting failed /dev/${disk}${disk_part}3" false true
+####################################################################################################################
+mkfs.ext4 -F -L ARCH_HOME "/dev/${disk}${disk_part}4"
+wait_input "Drive Formated /dev/${disk}${disk_part}4" "Drive Formatting failed /dev/${disk}${disk_part}4"
+
+swapon "/dev/${disk}${disk_part}2"
+wait_input "Mounted Swap" "Swap Mount failed" false true
+####################################################################################################################
+mount "/dev/${disk}${disk_part}3" /mnt
+wait_input "Mounted /mnt" "/mnt Mount failed" false true
+####################################################################################################################
+mkdir /mnt/boot
+mount "/dev/${disk}${disk_part}1" /mnt/boot
+wait_input "Mounted /mnt/boot" "/mnt/boot Mount failed" false true
+####################################################################################################################
+mkdir /mnt/home
+mount "/dev/${disk}${disk_part}4" /mnt/home
+wait_input "Mounted /mnt/home" "/mnt/home Mount failed" false true
+
+chmod 777 ./files/install.sh
+wait_input "Files Copied and Priviled Elevated" "Files Copy or Priviled Elevat failed" false true
+cp -r ./ /mnt/home/AutoArch
+wait_input "Files Copied and Priviled Elevated" "Files Copy or Priviled Elevat failed" false true
+
+figlet "Start pacstrap install"
+pacstrap /mnt base base-devel linux linux-firmware \
+        refind ntfs-3g unzip wget networkmanager sddm
+wait_input "Filesystem created" "Filesystem creation failed"
+
+figlet "Start install script in mounted Filesystem"
+arch-chroot /mnt /home/AutoArch/install.sh
+
+figlet "Create Fstab File"
+genfstab -U /mnt >> /mnt/etc/fstab
+wait_input "fstab created" "fstab creation failed"

@@ -1,3 +1,14 @@
 {
-    "nuxt.isNuxtApp": false
+    "nuxt.isNuxtApp": false,
+    "grammarly.selectors": [
+        {
+            "language": "properties",
+            "scheme": "file"
+        },
+        {
+            "language": "shellscript",
+            "scheme": "file",
+            "pattern": "preinstall.sh"
+        }
+    ]
 }
