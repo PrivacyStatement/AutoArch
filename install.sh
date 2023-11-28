@@ -83,7 +83,7 @@ wait_input "Files Copied and Priviled Elevated" "Files Copy or Priviled Elevat f
 
 figlet "Start pacstrap install"
 pacstrap /mnt base base-devel linux linux-firmware \
-        refind ntfs-3g unzip wget networkmanager sddm
+        refind ntfs-3g unzip wget networkmanager sddm figlet
 wait_input "Filesystem created" "Filesystem creation failed"
 
 figlet "Start install script in mounted Filesystem"

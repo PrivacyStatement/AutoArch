@@ -1,19 +1,20 @@
 source ./scripts/func_vars.sh
 source ./settings.sh
 
-#install default
-steam_font=ttf-liberation
-hyprland_portal=xdg-desktop-portal-hyprland
 if [ !debug ]; then
 confirm=--noconfirm
 else
 confirm=""
 fi
 
-#time, language, hostname, hosts 
+figlet "Set System Settings"
+#time, language, hostname, hosts
+trap "wait_input 'Systemsettings set Setting' 'locale has failed'" ERR
 ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+wait_input "Timezone set" "Setting timezone has failed"
 echo "de_DE.UTF-8 UTF-8" >> /etc/local.gen
 locale-gen
+wait_input "locale set" "Setting locale has failed"
 echo LANG=de_DE.UTF-8 >> /etc/locale.conf
 echo KEYMAP=de-latin1-nodeadkeys >> /etc/vconsole.conf
 echo arch"$User" >> /etc/hostname

@@ -8,3 +8,7 @@ User=timon
 PW=1234
 Patition_BOOT=nvme0n1p1
 Patition_ROOT=nvme0n1p3
+
+#install default
+steam_font=ttf-liberation
+hyprland_portal=xdg-desktop-portal-hyprland

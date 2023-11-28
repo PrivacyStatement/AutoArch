@@ -10,17 +10,28 @@ Cyan='\033[0;36m'         # Cyan
 White='\033[0;37m'        # White
 
 width=$(stty size | awk '{print $2}')
+ERROR_CODE="Unkown Error"
 
-wait_input(){
-  if [ $? -eq 0 ]; then
-    echo -e "${Green}${1}${Color_Off}"
-  else
-    echo -e "${Red}${2}${Color_Off}"
-    if [ ! $3 ]; then
-      exit 1
-    fi
-  fi
-  [[ "$debug" == true && $4 ]] && (echo "Press Enter to continue..."; read)
+handle_error() {
+    echo -e "
+${Red}
+################################
+There was a error on Line ${1}
+ERROR CODE: $ERROR_CODE
+################################
+${Color_Off}"
+  exit 1
+}
+
+success() {
+    ERROR_CODE="Error while trying to display success message. HOW THE F DID THIS HAPPEN?"
+    echo -e "${Green}$1${Color_Off}"
+    [[ "$debug" == true && $2 ]] && (echo -e "${Purple}Press Enter to continue...${Color_Off}"; read)
+    ERROR_CODE="Unkown Error"
+}
+
+CHAPTER(){
+  figlet $1
 }
 
 set_config(){
