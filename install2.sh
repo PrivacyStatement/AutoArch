@@ -9,6 +9,15 @@ source ./settings.sh
 ####################
 trap 'handle_error $LINENO' ERR
 
+echo -e "$Yellow"
+echo "Formatting Partitions:DRIVE /dev/${disk}
+::::---------
+Partitions:${disk}${disk_part}1:${disk}${disk_part}2:${disk}${disk_part}3:${disk}${disk_part}4
+Lable:ARCH_BOOT:SWAP:ARCH_ROOT:ARCH_HOME
+Format:FAT32:SWAP:EXT4:EXT4
+Mount-point (/mnt):/boot:swap:/:/home" | column -s: -t -o "  |  " | sed '2 s/./-/g' | sed 's/(?<=\n.*?)(?<!.*\|.*)\|/||/g'
+echo -e "$Color_Off"
+
 ####################
 ###NETWORK CHECK####
 ####################
@@ -71,9 +80,9 @@ echo linux
 echo w # Write changes
 ) | fdisk "/dev/${disk}"
 success "
-| Formatting Partitions |  DRIVE /dev/${disk}  |                      |                      |                      |
-|-----------------------|----------------------|----------------------|----------------------|----------------------|
-| Partitions            | ${disk}${disk_part}1 | ${disk}${disk_part}2 | ${disk}${disk_part}3 | ${disk}${disk_part}4 |
+Formatting Partitions |  DRIVE /dev/${disk}
+
+${echo 'Partitions:${disk}${disk_part}1:${disk}${disk_part}2:${disk}${disk_part}3:${disk}${disk_part}4' || column -s: -t}
 | Lable                 | ARCH_BOOT            | SWAP                 | ARCH_ROOT            | ARCH_HOME            |
 | Format                | FAT32                | SWAP                 | EXT4                 | EXT4                 |
 | Mount-point (/mnt)    | /boot                | swap                 | /                    | /home                |

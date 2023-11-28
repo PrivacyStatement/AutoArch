@@ -3,3 +3,4 @@ timeshift
 apparmor
 selinux
 windows
+logfile

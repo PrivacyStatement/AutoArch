@@ -26,7 +26,7 @@ ${Color_Off}"
 success() {
     ERROR_CODE="Error while trying to display success message. HOW THE F DID THIS HAPPEN?"
     echo -e "${Green}$1${Color_Off}"
-    [[ "$debug" == true && $2 ]] && (echo -e "${Purple}Press Enter to continue...${Color_Off}"; read)
+    [[ "$debug" == true && !$2 ]] && (echo -e "${Purple}Press Enter to continue...${Color_Off}"; read)
     ERROR_CODE="Unkown Error"
 }
 
