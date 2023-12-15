@@ -9,14 +9,6 @@ source ./settings.sh
 ####################
 trap 'handle_error $LINENO' ERR
 
-echo -e "$Yellow"
-echo "Formatting Partitions:DRIVE /dev/${disk}
-::::---------
-Partitions:${disk}${disk_part}1:${disk}${disk_part}2:${disk}${disk_part}3:${disk}${disk_part}4
-Lable:ARCH_BOOT:SWAP:ARCH_ROOT:ARCH_HOME
-Format:FAT32:SWAP:EXT4:EXT4
-Mount-point (/mnt):/boot:swap:/:/home" | column -s: -t -o "  |  " | sed '2 s/./-/g' | sed 's/(?<=\n.*?)(?<!.*\|.*)\|/||/g'
-echo -e "$Color_Off"
 
 ####################
 ###NETWORK CHECK####
@@ -26,9 +18,9 @@ ping -c 1 "1.1.1.1"
 success "Network Connected"
 
 ##Install Figlet##
-ERROR_CODE="Figlet Install Failed"  
-pacman -Sy --noconfirm figlet
-success "Figlet Installed"
+#ERROR_CODE="Figlet Install Failed"  
+#pacman -Sy --noconfirm figlet
+#success "Figlet Installed"
 
 ####################
 CHAPTER "Testing UEFI"
@@ -79,14 +71,12 @@ echo 4
 echo linux
 echo w # Write changes
 ) | fdisk "/dev/${disk}"
-success "
-Formatting Partitions |  DRIVE /dev/${disk}
-
-${echo 'Partitions:${disk}${disk_part}1:${disk}${disk_part}2:${disk}${disk_part}3:${disk}${disk_part}4' || column -s: -t}
-| Lable                 | ARCH_BOOT            | SWAP                 | ARCH_ROOT            | ARCH_HOME            |
-| Format                | FAT32                | SWAP                 | EXT4                 | EXT4                 |
-| Mount-point (/mnt)    | /boot                | swap                 | /                    | /home                |
-"
+success "Formatting Partitions:DRIVE /dev/${disk}
+::::---------
+Partitions:${disk}${disk_part}1:${disk}${disk_part}2:${disk}${disk_part}3:${disk}${disk_part}4
+Lable:ARCH_BOOT:SWAP:ARCH_ROOT:ARCH_HOME
+Format:FAT32:SWAP:EXT4:EXT4
+Mount-point (/mnt):/boot:swap:/:/home" | column -s: -t -o "  |  " | sed '2 s/./-/g' | sed 's/|/\|\|/' 
 
 
 ####################
@@ -101,6 +91,52 @@ mkfs.ext4 -F -L ARCH_ROOT "/dev/${disk}${disk_part}3"
 ERROR_CODE="Drive Partition failed /dev/${disk}${disk_part}4 | EXT4"
 mkfs.ext4 -F -L ARCH_HOME "/dev/${disk}${disk_part}4"
 success "Partitions Created"
+
+####################
+CHAPTER "Mounting Partitions"
+####################
+swapon "/dev/${disk}${disk_part}2"
+ERROR_CODE="Swap Mount failed"
+mount "/dev/${disk}${disk_part}3" /mnt
+ERROR_CODE="/mnt Mount failed"
+mkdir /mnt/boot
+ERROR_CODE="Failed to Create /mnt/boot"
+mount "/dev/${disk}${disk_part}1" /mnt/boot
+ERROR_CODE="/mnt/boot Mount failed"
+mkdir /mnt/home
+ERROR_CODE="Failed to Create /mnt/home"
+mount "/dev/${disk}${disk_part}4" /mnt/home
+ERROR_CODE="/mnt/home Mount failed"
+success "Partitions Mounted"
+
+####################
+CHAPTER "Mounting Partitions"
+####################
+chmod 777 ./files/install.sh
+wait_input "Files Copied and Priviled Elevated" "Files Copy or Priviled Elevat failed" false true
+cp -r ./ /mnt/home/AutoArch
+wait_input "Files Copied and Priviled Elevated" "Files Copy or Priviled Elevat failed" false true
+
+####################
+CHAPTER "Pacstrap"
+####################
+ERROR_CODE="Pacstrap failed"
+pacstrap /mnt base base-devel linux linux-firmware \
+        refind ntfs-3g unzip wget networkmanager sddm
+success "Pacstrap sucessfull"
+
+####################
+CHAPTER "Switching to System"
+####################
+ERROR_CODE="Installation in Filesystem Failed"
+#arch-chroot /mnt /home/AutoArch/install.sh
+
+####################
+CHAPTER "Create fstab File"
+####################
+ERROR_CODE="fstab creation failed"
+genfstab -U /mnt >> /mnt/etc/fstab
+success "fstab created"
 
 ####################
 ######CLEAN UP######

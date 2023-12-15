@@ -31,7 +31,8 @@ success() {
 }
 
 CHAPTER(){
-  figlet $1
+  #figlet $1
+  echo -e "${Blue}---------$1---------${Color_Off}"
 }
 
 set_config(){
