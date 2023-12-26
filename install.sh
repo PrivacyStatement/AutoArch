@@ -1,21 +1,44 @@
+####################
+####IMPORT FILES####
+####################
 source ./scripts/func_vars.sh
 source ./settings.sh
 
-ping -c 1 "1.1.1.1"
-wait_input "Internet Connection Confirmed" "No Internet Connection"
+####################
+####CATCH ERRORS####
+####################
+trap 'handle_error $LINENO' ERR
 
+
+####################
+###NETWORK CHECK####
+####################
+ERROR_CODE="No Network Connection"  
+ping -c 1 "1.1.1.1" 
+success "Network Connected"
+
+##Install Figlet##
+ERROR_CODE="Figlet Install has Failed"  
 pacman -Sy --noconfirm figlet
-wait_input "Figlet Installed"
+success "Figlet Installed"
 
+####################
+CHAPTER "Testing UEFI"
+####################
 
-figlet "Testing UEFI"
+ERROR_CODE="System must be booted over UEFI"
 ls /sys/firmware/efi/efivars
-wait_input "UEFI Used" "Not UEFI" true
+success "UEFI Used"
 
+##Load Keyboard Layout##
+ERROR_CODE="Keyboard layout $lang couldn't get loaded"
 loadkeys $lang
-wait_input "Keyboard layout $lang loaded" "Keyboard layout $lang couldn't get loaded"
+success "Keyboard layout $lang loaded"
 
-figlet "Patition Drive ${disk}"
+####################
+CHAPTER "Patition Drive ${disk}"
+####################
+ERROR_CODE="Drive Partitioning has failed"
 (
 echo g
 echo n 
@@ -48,47 +71,77 @@ echo 4
 echo linux
 echo w # Write changes
 ) | fdisk "/dev/${disk}"
-wait_input "Partitions created" "Drive Formatting failed"
+success "Formatting Partitions:DRIVE /dev/${disk}
+::::---------
+Partitions:${disk}${disk_part}1:${disk}${disk_part}2:${disk}${disk_part}3:${disk}${disk_part}4
+Lable:ARCH_BOOT:SWAP:ARCH_ROOT:ARCH_HOME
+Format:FAT32:SWAP:EXT4:EXT4
+Mount-point (/mnt):/boot:swap:/:/home" | column -s: -t -o "  |  " | sed '2 s/./-/g' | sed 's/|/\|\|/' 
 
+
+####################
+CHAPTER "Formatting Partitions"
+####################
+ERROR_CODE="Resetting mounts failed"
+sudo umount -f /dev/$disk?* || /bin/true
+ERROR_CODE="Resetting swap failed"
+swapoff --all
+
+ERROR_CODE="Drive Partition failed /dev/${disk}${disk_part}1 | FAT32"
 mkfs.fat -F 32 -n ARCH_BOOT "/dev/${disk}${disk_part}1"
-wait_input "Drive Formated /dev/${disk}${disk_part}1" "Drive Formatting failed /dev/${disk}${disk_part}1" false true
-####################################################################################################################
+ERROR_CODE="Drive Partition failed /dev/${disk}${disk_part}2 | SWAP"
 mkswap -L SWAP "/dev/${disk}${disk_part}2"
-wait_input "Drive Formated /dev/${disk}${disk_part}2" "Drive Formatting failed /dev/${disk}${disk_part}2" false true
-####################################################################################################################
+ERROR_CODE="Drive Partition failed /dev/${disk}${disk_part}3 | EXT4"
 mkfs.ext4 -F -L ARCH_ROOT "/dev/${disk}${disk_part}3"
-wait_input "Drive Formated /dev/${disk}${disk_part}3" "Drive Formatting failed /dev/${disk}${disk_part}3" false true
-####################################################################################################################
+ERROR_CODE="Drive Partition failed /dev/${disk}${disk_part}4 | EXT4"
 mkfs.ext4 -F -L ARCH_HOME "/dev/${disk}${disk_part}4"
-wait_input "Drive Formated /dev/${disk}${disk_part}4" "Drive Formatting failed /dev/${disk}${disk_part}4"
+success "Partitions Created"
 
+####################
+CHAPTER "Mounting Partitions"
+####################
 swapon "/dev/${disk}${disk_part}2"
-wait_input "Mounted Swap" "Swap Mount failed" false true
-####################################################################################################################
+ERROR_CODE="Swap Mount failed"
 mount "/dev/${disk}${disk_part}3" /mnt
-wait_input "Mounted /mnt" "/mnt Mount failed" false true
-####################################################################################################################
+ERROR_CODE="/mnt Mount failed"
 mkdir /mnt/boot
+ERROR_CODE="Failed to Create /mnt/boot"
 mount "/dev/${disk}${disk_part}1" /mnt/boot
-wait_input "Mounted /mnt/boot" "/mnt/boot Mount failed" false true
-####################################################################################################################
+ERROR_CODE="/mnt/boot Mount failed"
 mkdir /mnt/home
+ERROR_CODE="Failed to Create /mnt/home"
 mount "/dev/${disk}${disk_part}4" /mnt/home
-wait_input "Mounted /mnt/home" "/mnt/home Mount failed" false true
+ERROR_CODE="/mnt/home Mount failed"
+success "Partitions Mounted"
 
-chmod 777 ./files/install.sh
-wait_input "Files Copied and Priviled Elevated" "Files Copy or Priviled Elevat failed" false true
+####################
+####COPY  FOLDER####
+####################
+ERROR_CODE="Copy files failed"
 cp -r ./ /mnt/home/AutoArch
-wait_input "Files Copied and Priviled Elevated" "Files Copy or Priviled Elevat failed" false true
 
-figlet "Start pacstrap install"
+####################
+CHAPTER "Pacstrap"
+####################
+ERROR_CODE="Pacstrap failed"
 pacstrap /mnt base base-devel linux linux-firmware \
         refind ntfs-3g unzip wget networkmanager sddm figlet
-wait_input "Filesystem created" "Filesystem creation failed"
+success "Pacstrap sucessfull"
 
-figlet "Start install script in mounted Filesystem"
-arch-chroot /mnt /home/AutoArch/install.sh
+####################
+CHAPTER "Switching to System"
+####################
+ERROR_CODE="Installation in Filesystem Failed"
+arch-chroot /mnt /home/AutoArch/scripts/install.sh
 
-figlet "Create Fstab File"
+####################
+CHAPTER "Create fstab File"
+####################
+ERROR_CODE="fstab creation failed"
 genfstab -U /mnt >> /mnt/etc/fstab
-wait_input "fstab created" "fstab creation failed"
+success "fstab created"
+
+####################
+######CLEAN UP######
+####################
+trap - ERR

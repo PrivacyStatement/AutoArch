@@ -1,99 +1,161 @@
-source ./scripts/func_vars.sh
-source ./settings.sh
+####################
+####IMPORT FILES####
+####################
+source /home/AutoArch/scripts/func_vars.sh
+source /home/AutoArch/settings.sh
 
-if [ !debug ]; then
-confirm=--noconfirm
-else
-confirm=""
-fi
+####################
+####CATCH ERRORS####
+####################
+trap 'handle_error $LINENO' ERR
 
-figlet "Set System Settings"
-#time, language, hostname, hosts
-trap "wait_input 'Systemsettings set Setting' 'locale has failed'" ERR
-ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
-wait_input "Timezone set" "Setting timezone has failed"
-echo "de_DE.UTF-8 UTF-8" >> /etc/local.gen
+####################
+###NETWORK CHECK####
+####################
+ERROR_CODE="No Network Connection!"
+ping -c 1 "1.1.1.1" 
+success "Network Connected"
+
+####################
+CHAPTER "Set System Settings"
+####################
+ERROR_CODE="Setting Timezone has failed"
+ln -s /usr/share/zoneinfo/$timezone_set /etc/localtime
+ERROR_CODE="Setting locale has failed"
+echo "$local_set UTF-8" >> /etc/local.gen
 locale-gen
-wait_input "locale set" "Setting locale has failed"
-echo LANG=de_DE.UTF-8 >> /etc/locale.conf
-echo KEYMAP=de-latin1-nodeadkeys >> /etc/vconsole.conf
+ERROR_CODE="Setting language has failed"
+echo LANG=$local_set >> /etc/locale.conf
+ERROR_CODE="Setting keymap has failed"
+echo KEYMAP=$keymap_set >> /etc/vconsole.conf
+ERROR_CODE="Setting hostname has failed"
 echo arch"$User" >> /etc/hostname
+ERROR_CODE="Setting hostsfile has failed"
 echo "127.0.0.1	localhost" >> /etc/hosts
 echo "::1		localhost" >> /etc/hosts
 echo "127.0.1.1	arch"$User".localdomain	arch" >> /etc/hosts
+success "System Settings are set."
 
-#add user
+####################
+CHAPTER "Add User"
+####################
+ERROR_CODE="Set wheel group to sudoers has failed"
 echo "%wheel      ALL=(ALL:ALL) ALL" >> /etc/sudoers
-echo root:$PW | chpasswd 
+echo "root ALL=($user) NOPASSWD: ALL" >> /etc/sudoers
+ERROR_CODE="Changing root password has failed"
+echo root:$root_PW | chpasswd
+ERROR_CODE="Adding New User has failed"
 useradd -m $User
+ERROR_CODE="Setting password for new user has failed"
 echo $User:$PW | chpasswd
+ERROR_CODE="Adding groupes to new user has failed"
 usermod -aG wheel,audio,video,optical,storage $User
+success "User $name added and Password changed"
 
-#Bootloader config
-refind-install --usedefault "/dev/${Patition_BOOT}" --alldrivers
+####################
+CHAPTER "Bootloader configuration"
+####################
+ERROR_CODE="Setting up bootloader has failed"
+refind-install --usedefault "/dev/disk/by-label/ARCH_BOOT" --alldrivers
 mkrlconf
-echo "\"Boot with minimal options\"   \"ro root=/dev/${Patition_ROOT}\"" > /boot/refind_linux.conf
-cp /home/AutoArch/refind.conf /boot/EFI/BOOT/refind.conf
+ERROR_CODE="Configuring bootloader has failed"
+Patition_ROOT=$(realpath '/dev/disk/by-label/ARCH-HOME')
+echo "\"Boot with minimal options\"   \"ro root=${Patition_ROOT}\"" > /boot/refind_linux.conf
+cp /home/AutoArch/files/refind.conf /boot/EFI/BOOT/refind.conf
 
+ERROR_CODE="Loading Bootloader themes has failed"
 mkdir /boot/EFI/BOOT/themes
 wget https://github.com/evanpurkhiser/rEFInd-minimal/archive/refs/heads/main.zip
 unzip main.zip -d /boot/EFI/BOOT/themes
 mv /boot/EFI/BOOT/themes/rEFInd-minimal-main /boot/EFI/BOOT/themes/rEFInd-minimal
 rm main.zip
+success "Refind bootloader installed"
 
-#make game folder
-mkdir /home/$User/game
-mount /dev/sdb2 /home/$User/game
+####################
+CHAPTER "Mount External Folder"
+####################
+ERROR_CODE="Mount External Folder has failed"
+#mkdir /home/$User/game
+#mount /dev/sdb2 /home/$User/game
+success "Extra Folder mounted"
 
-#Start Network after reboot
-systemctl enable NetworkManager
-
-#pacman config
+####################
+CHAPTER "pacman config"
+####################
+ERROR_CODE="Changing pacman config has failed"
 sed -i 's/#\[multilib\]/\[multilib\]\nInclude = \/etc\/pacman.d\/mirrorlist/' /etc/pacman.conf
 sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/' /etc/pacman.conf
 
-#install and update
-pacman -Syu $confirm
-#fonts + themes
-pacman -Sy $confirm ttf-liberation ttf-font-awesome ttf-fira-sans ttf-fira-code ttf-firacode-nerd breeze breeze-gtk chili-sddm-theme papirus-icon-theme
-#driver
-pacman -Sy $confirm gnome-keyring pipewire pipewire-jack pipewire-media-session pulseaudio-bluetooth
-#hyprland
-pacman -Sy $confirm xdg-desktop-portal-hyprland hyprland dunst waybar polkit-kde-agent qt5-wayland qt6-wayland cliphist wlogout
-#comand line applications
-pacman -Sy $confirm $hyprland_portal reflector grim slurp nano flatpak python git bpytop firewalld ipset ebtables neofetch xautolock swayidle
-#gui
-pacman -Sy $confirm $steam_font steam alacritty lutris gnome-boxes kdeconnect sxiv mpv vlc xfce4-power-manager thunar lxappearance pavucontrol blueman swappy
+####################
+CHAPTER "update and install"
+####################
+ERROR_CODE="Installing pacman software has failed"
+source  /home/AutoArch/scripts/install_pacman.sh
+success "Installing software"
 
+####################
+CHAPTER "Enable systemctl service"
+####################
+#Network
+ERROR_CODE="Enable NetworkManager has failed"
+systemctl enable NetworkManager
 #Bluetooth
+ERROR_CODE="Enable bluetooth has failed"
 systemctl enable bluetooth
-
 #firewall
+ERROR_CODE="Enable firewalld has failed"
 systemctl enable firewalld
+#sddm
+ERROR_CODE="Enable sddm has failed"
+systemctl enable sddm
+success "Enable systemctl services"
 
-#set fastes mirror
-reflector -c Germany --sort rate -l 50 --save /etc/pacman.d/mirrorlist 
+####################
+CHAPTER "Set fastes mirror"
+####################
+ERROR_CODE="Finding fastes mirror has failed"
+reflector --country "$mirror_country" --latest 50 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+success "Fastest mirreor set for $mirror_country"
 
-#install yay
-mkdir ./AUR
-cd ./AUR
+####################
+CHAPTER "Installing YAY"
+####################
+ERROR_CODE="Creating folder for YAY install has failed"
+mkdir /AUR
+cd /AUR
+ERROR_CODE="Clone YAY from git has failed"
 git clone https://aur.archlinux.org/yay-git.git
 chmod 777 ./yay-git
 cd ./yay-git
-sudo -u $User makepkg -sic
-cd ../..
-rm -r ~/AUR
+ERROR_CODE="Installing YAY in user contexted has failed"
+sudo -u $User makepkg -sic $confirm
+ERROR_CODE="Removing folder for YAY install has failed"
+cd /
+rm -r /AUR
+success "Yay installed"
 
-#sddm
-systemctl enable sddm
+####################
+CHAPTER "Installing AUR Packages"
+####################
+ERROR_CODE="Installing AUR Packages has failed"
+sudo -u $User yay -S $confirm swww swaylock-effects goverlay timeshift rofi-lbonn-wayland archlinux-tweak-tool-git bibata-cursor-theme wlogout chili-sddm-theme
+success "AUR packages installed"
+
+flatpak install -y flathub com.jetbrains.PyCharm-Community org.mozilla.firefox org.chromium.Chromium com.visualstudio.code \
+                        com.github.tchx84.Flatseal com.discordapp.Discord org.libreoffice.LibreOffice \
+                        com.getmailspring.Mailspring com.github.sdv43.whaler io.github.hakuneko.HakuNeko \
+                        com.mojang.Minecraft \
+
+
+#remove sudo -u user rights
+ERROR_CODE="Removing root acces to $user has failed"
+sudo sed -i 's/root ALL=($user) NOPASSWD: ALL//' /etc/sudoers
+
+####################
+CHAPTER "Setting Dotfiles"
+####################
+ERROR_CODE="Dotfiles copying has failed"
 cp /home/AutoArch/files/sddm.conf /etc/sddm.conf
-
-sudo -u $User yay -S swww swaylock-effects goverlay timeshift rofi-lbonn-wayland archlinux-tweak-tool-git bibata-cursor-theme
-
-###############################
-############dotfiles###########
-###############################
-
 set_config "" ".bashrc" "bashrc"
 set_config ".config" "alacitty.yml" "alacitty.yml"
 set_config ".config" "dunstrc" "dunstrc"
@@ -109,6 +171,4 @@ set_config ".config/hypr" "hyprland.conf" "hyprland.conf"
 set_config ".config" "background" "../background"
 set_config ".config" "scripts" "scripts"
 set_config ".config" "rofi" "rofi"
-
-
-
+success "Dotfiles set"

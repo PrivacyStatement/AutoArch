@@ -10,14 +10,18 @@ root="50G"
 debug=true
 User=timon
 PW=1234
+root_PW=1234
 Patition_BOOT=nvme0n1p1
 Patition_ROOT=nvme0n1p3
-
-#install default
-steam_font=ttf-liberation
-hyprland_portal=xdg-desktop-portal-hyprland
+confirm=--noconfirm
 '
 
+#File from /usr/share/zoneinfo/
+timezone_set="Europe/Berlin"
+local_set="de_DE.UTF-8"
+keymap_set="de-latin1-nodeadkeys"
+
+mirror_country="Germany"
 ####################
 ########TEST########
 ####################
@@ -29,9 +33,9 @@ root="10G"
 debug=true
 User=timon
 PW=1234
-Patition_BOOT=nvme0n1p1
-Patition_ROOT=nvme0n1p3
+root_PW=1234
+confirm=""
 
 #install default
-steam_font=ttf-liberation
-hyprland_portal=xdg-desktop-portal-hyprland
+vulcan_driver="vulkan-radeon"
+lib32_vulkan_driver="lib32-vulkan-radeon"

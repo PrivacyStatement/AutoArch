@@ -10,5 +10,6 @@
             "scheme": "file",
             "pattern": "preinstall.sh"
         }
-    ]
+    ],
+    "editor.wordWrap": "on"
 }

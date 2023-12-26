@@ -31,8 +31,12 @@ success() {
 }
 
 CHAPTER(){
-  #figlet $1
+  if test -f "/bin/figlet"
+  then
+  figlet $1
+  else
   echo -e "${Blue}---------$1---------${Color_Off}"
+  fi
 }
 
 set_config(){
