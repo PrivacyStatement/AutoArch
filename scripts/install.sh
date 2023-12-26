@@ -42,6 +42,7 @@ CHAPTER "Add User"
 ERROR_CODE="Set wheel group to sudoers has failed"
 echo "%wheel      ALL=(ALL:ALL) ALL" >> /etc/sudoers
 echo "root ALL=($user) NOPASSWD: ALL" >> /etc/sudoers
+#echo "ALL ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 ERROR_CODE="Changing root password has failed"
 echo root:$root_PW | chpasswd
 ERROR_CODE="Adding New User has failed"
@@ -75,8 +76,8 @@ success "Refind bootloader installed"
 CHAPTER "Mount External Folder"
 ####################
 ERROR_CODE="Mount External Folder has failed"
-#mkdir /home/$User/game
-#mount /dev/sdb2 /home/$User/game
+mkdir /home/$User/game
+mount /dev/sdb2 /home/$User/game
 success "Extra Folder mounted"
 
 ####################
@@ -141,15 +142,10 @@ ERROR_CODE="Installing AUR Packages has failed"
 sudo -u $User yay -S $confirm swww swaylock-effects goverlay timeshift rofi-lbonn-wayland archlinux-tweak-tool-git bibata-cursor-theme wlogout chili-sddm-theme
 success "AUR packages installed"
 
-flatpak install -y flathub com.jetbrains.PyCharm-Community org.mozilla.firefox org.chromium.Chromium com.visualstudio.code \
-                        com.github.tchx84.Flatseal com.discordapp.Discord org.libreoffice.LibreOffice \
-                        com.getmailspring.Mailspring com.github.sdv43.whaler io.github.hakuneko.HakuNeko \
-                        com.mojang.Minecraft \
-
-
 #remove sudo -u user rights
 ERROR_CODE="Removing root acces to $user has failed"
 sudo sed -i 's/root ALL=($user) NOPASSWD: ALL//' /etc/sudoers
+#sudo sed -i "s/ALL ALL=(ALL:ALL) NOPASSWD: ALL//" /etc/sudoers
 
 ####################
 CHAPTER "Setting Dotfiles"

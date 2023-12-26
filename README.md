@@ -6,8 +6,8 @@ RUN:
 3. unzip main.zip
 4. chmod 700 ./AutoArch/install.sh
 5. ./install.sh
-6. on restart 
-    firewall-cmd --set-default-zone=home
+6. after restart run after_install.sh
+    
     
 ERRORs:
 yay needs confirm and PW

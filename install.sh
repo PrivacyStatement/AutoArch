@@ -83,7 +83,8 @@ Mount-point (/mnt):/boot:swap:/:/home" | column -s: -t -o "  |  " | sed '2 s/./-
 CHAPTER "Formatting Partitions"
 ####################
 ERROR_CODE="Resetting mounts failed"
-sudo umount -f /dev/$disk?* || /bin/true
+umount -f /dev/$disk?* || /bin/true
+umount -f /dev/$disk?* || /bin/true
 ERROR_CODE="Resetting swap failed"
 swapoff --all
 
@@ -118,6 +119,7 @@ success "Partitions Mounted"
 ####COPY  FOLDER####
 ####################
 ERROR_CODE="Copy files failed"
+chmod 777 ./scripts/install.sh
 cp -r ./ /mnt/home/AutoArch
 
 ####################
